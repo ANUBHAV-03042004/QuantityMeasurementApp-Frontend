@@ -268,7 +268,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:6px 40px;display:fle
   text-decoration: none;
 }
 .nav-logo-img {
-  height: 52px;
+  height: 68px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
