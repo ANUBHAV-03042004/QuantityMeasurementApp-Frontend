@@ -261,20 +261,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
   .op-symbol{display:none}
 }
 
-/* ── Navbar logo — image only, sized to show full logo with text inside ── */
+/* ── Navbar logo ── */
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0;                   /* no gap — logo image contains the full name */
   text-decoration: none;
 }
 .nav-logo-img {
-  height: 48px;             /* tall enough to read "QUANTRA" inside the logo */
+  /* Taller so the full QUANTRA wordmark inside the image is readable */
+  height: 60px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
-  /* Dark pill background so the logo is visible even with transparent PNG */
-  background: rgba(200,255,0,.08);
-  border-radius: 8px;
-  padding: 2px 6px;
+  /* mix-blend-mode: screen makes every pure-black pixel transparent.
+     The logo's coloured parts (greens, yellows, white text) stay fully
+     visible against the dark navbar — no background rect needed, no image
+     editing needed. */
+  mix-blend-mode: screen;
+  /* No background, no border-radius, no padding — the blend mode handles it */
+  background: none;
+  border-radius: 0;
+  padding: 0;
 }
