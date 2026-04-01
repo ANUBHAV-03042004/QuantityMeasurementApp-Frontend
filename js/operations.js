@@ -19,7 +19,14 @@ let historyFilter = 'ALL';
 /* ── Init ──────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   updateUnits();
-  renderHistorySection();   // show auth gate or load history
+  // Apply initial CONVERT UI state if somehow CONVERT is default (it's not, but safe)
+  const val2Input = document.getElementById('val2');
+  const secondLabel = document.querySelector('.operand-block:last-child .form-label');
+  if (currentOp !== 'CONVERT') {
+    if (val2Input)   val2Input.style.display = '';
+    if (secondLabel) secondLabel.textContent = 'SECOND QUANTITY';
+  }
+  renderHistorySection();
 });
 
 /* ── Operation selection ─────────────────────────────────────────────────── */
@@ -32,6 +39,18 @@ function selectOp(el, op) {
   document.getElementById('op-desc').textContent   = meta.desc;
   document.getElementById('op-symbol').textContent = meta.symbol;
   document.getElementById('result-card').classList.remove('show');
+
+  // For CONVERT: hide val2 (value irrelevant), relabel second block as TARGET UNIT
+  const val2Input   = document.getElementById('val2');
+  const secondLabel = document.querySelector('.operand-block:last-child .form-label');
+  if (op === 'CONVERT') {
+    if (val2Input)   { val2Input.style.display = 'none'; val2Input.value = '0'; }
+    if (secondLabel) secondLabel.textContent = 'TARGET UNIT';
+  } else {
+    if (val2Input)   val2Input.style.display = '';
+    if (secondLabel) secondLabel.textContent = 'SECOND QUANTITY';
+  }
+
   if (typeof gsap !== 'undefined')
     gsap.fromTo('#op-title', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: .3, ease: 'power2.out' });
 }
@@ -60,7 +79,10 @@ async function runOperation() {
   const unit2 = document.getElementById('unit2').value;
   const mtype = document.getElementById('mtype').value;
 
-  if (isNaN(val1) || isNaN(val2)) { toast('Enter valid numbers', 'error'); return; }
+  // For CONVERT, second value is irrelevant — only target unit matters
+  if (isNaN(val1)) { toast('Enter a valid number', 'error'); return; }
+  if (currentOp !== 'CONVERT' && isNaN(val2)) { toast('Enter valid numbers', 'error'); return; }
+  const effectiveVal2 = currentOp === 'CONVERT' ? 0 : val2;
 
   const btn = document.getElementById('run-btn');
   btn.innerHTML = '<span class="loader"></span>';
@@ -68,7 +90,7 @@ async function runOperation() {
 
   const body = {
     thisQuantityDTO: { value: val1, unit: unit1, measurementType: mtype },
-    thatQuantityDTO: { value: val2, unit: unit2, measurementType: mtype },
+    thatQuantityDTO: { value: effectiveVal2, unit: unit2, measurementType: mtype },
   };
 
   try {
@@ -126,7 +148,7 @@ function showResult(data) {
     rm.innerHTML = `
       <div class="result-meta-item"><div class="result-meta-key">OPERATION</div><div class="result-meta-val">${data.operation || '—'}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">FROM</div><div class="result-meta-val">${data.thisValue} ${data.thisUnit}</div></div>
-      <div class="result-meta-item"><div class="result-meta-key">TO</div><div class="result-meta-val">${data.thatValue != null ? data.thatValue + ' ' + (data.thatUnit || '') : '—'}</div></div>
+      <div class="result-meta-item"><div class="result-meta-key">TO UNIT</div><div class="result-meta-val">${data.resultUnit || data.thatUnit || '—'}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">TYPE</div><div class="result-meta-val">${data.thisMeasurementType || '—'}</div></div>`;
   }
 
