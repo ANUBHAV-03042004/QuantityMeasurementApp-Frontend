@@ -19,7 +19,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
 
 /* ── Navbar ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(10,10,15,.85);backdrop-filter:blur(20px)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(10,10,15,.85);backdrop-filter:blur(20px)}
 .nav-logo{font-size:22px;font-weight:800;letter-spacing:-1px;color:var(--text);text-decoration:none;cursor:none}
 .nav-logo span{color:var(--accent)}
 .nav-tabs{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:40px;padding:4px}
@@ -268,17 +268,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
   text-decoration: none;
 }
 .nav-logo-img {
-  /* Taller so the full QUANTRA wordmark inside the image is readable */
-  height: 60px;
+  height: 90px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
-  /* mix-blend-mode: screen makes every pure-black pixel transparent.
-     The logo's coloured parts (greens, yellows, white text) stay fully
-     visible against the dark navbar — no background rect needed, no image
-     editing needed. */
-  mix-blend-mode: screen;
-  /* No background, no border-radius, no padding — the blend mode handles it */
   background: none;
   border-radius: 0;
   padding: 0;
