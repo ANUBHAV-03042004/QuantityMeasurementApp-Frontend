@@ -260,3 +260,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
   .operands-grid{grid-template-columns:1fr;gap:10px}
   .op-symbol{display:none}
 }
+
+/* ── Navbar logo image ─────────────────────────────────────────────────── */
+.nav-logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
