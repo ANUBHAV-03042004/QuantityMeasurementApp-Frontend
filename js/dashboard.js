@@ -6,7 +6,6 @@ async function initDashboard() {
   const header = document.getElementById('dash-welcome');
 
   if (!isAuthed()) {
-    // Show auth gate in place of stats/charts/history panels
     showDashGate();
     return;
   }
@@ -38,7 +37,6 @@ async function initDashboard() {
       { label: 'DIV', val: div, color: 'var(--accent3)' },
     ]);
 
-    // Type distribution — fetch history for each type
     const [len, wgt, vol, tmp] = await Promise.all([
       api('GET', '/quantities/history/type/LengthUnit').catch(() => []),
       api('GET', '/quantities/history/type/WeightUnit').catch(() => []),
@@ -47,9 +45,8 @@ async function initDashboard() {
     ]);
     renderDonut([len.length, wgt.length, vol.length, tmp.length]);
 
-    // Recent operations
     const allRecent = await Promise.all(
-      ['COMPARE', 'ADD', 'CONVERT'].map(op =>
+      ['COMPARE', 'ADD', 'CONVERT', 'SUBTRACT', 'DIVIDE'].map(op =>
         api('GET', `/quantities/history/operation/${op}`).catch(() => [])
       )
     );
@@ -112,7 +109,7 @@ function renderBarChart(ops) {
 
 function renderDonut([len, wgt, vol, tmp]) {
   const total = len + wgt + vol + tmp || 1;
-  const circ  = 276; // 2 * π * 44 ≈ 276
+  const circ  = 276;
   const colors = ['arc-length', 'arc-weight', 'arc-volume', 'arc-temp'];
   const vals   = [len, wgt, vol, tmp];
   let offset   = 0;
@@ -128,18 +125,36 @@ function renderDonut([len, wgt, vol, tmp]) {
   });
 }
 
+/* ── Recent operations — no ID shown, result value shown instead ─────────── */
 function renderRecent(data) {
   const el = document.getElementById('recent-list');
   if (!el) return;
-  if (!data.length) { el.innerHTML = '<div class="history-empty">No operations yet</div>'; return; }
-  el.innerHTML = data.map(r => `
+  if (!data.length) {
+    el.innerHTML = '<div class="history-empty">No operations yet</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(r => {
+    // Build a compact result string: "= true", "→ 12.0 INCHES", etc.
+    let resultStr = '';
+    if (r.operation === 'COMPARE') {
+      resultStr = r.resultString === 'true' ? '= true' : '≠ false';
+    } else if (r.resultValue !== undefined && r.resultValue !== null) {
+      const val = Number.isInteger(r.resultValue)
+        ? r.resultValue
+        : parseFloat(r.resultValue.toFixed(4));
+      resultStr = `${OP_SYMBOLS[r.operation] || '='} ${val}${r.resultUnit ? ' ' + r.resultUnit : ''}`;
+    }
+
+    return `
     <div class="recent-item">
       <div class="recent-left">
         <span class="op-badge ${r.operation || ''}">${r.operation || '—'}</span>
         <span class="recent-expr">${r.thisValue} ${r.thisUnit || ''} ${OP_SYMBOLS[r.operation] || ''} ${r.thatValue != null ? r.thatValue + ' ' + (r.thatUnit || '') : ''}</span>
       </div>
-      <span class="recent-time">#${r.id || '—'}</span>
-    </div>`).join('');
+      <span class="recent-result">${resultStr}</span>
+    </div>`;
+  }).join('');
 
   if (typeof gsap !== 'undefined')
     gsap.from('.recent-item', { x: -16, opacity: 0, stagger: .06, duration: .4, ease: 'power2.out' });
