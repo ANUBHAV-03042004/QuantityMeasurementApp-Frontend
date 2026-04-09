@@ -2,7 +2,7 @@
 function loginWithGoogle() {
   // Spring Security handles the full OAuth2 flow; backend redirects to
   // oauth2-callback.html with ?token=<jwt> on success.
- window.location.href = 'https://quantity-measurement-app-backend.azurewebsites.net/oauth2/authorization/google';
+ window.location.href = 'http://quantra.us-east-1.elasticbeanstalk.com/oauth2/authorization/google';
 }
 // Google OAuth — change:
 
@@ -22,7 +22,7 @@ async function doLogin() {
   try {
     
   // Login fetch — change:
-const res = await fetch('https://quantity-measurement-app-backend.azurewebsites.net/api/v1/auth/login', {
+const res = await fetch('http://quantra.us-east-1.elasticbeanstalk.com/api/v1/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password: pass }),
@@ -65,7 +65,7 @@ async function doRegister() {
   btn.disabled = true;
 
   try {
-  const res = await fetch('https://quantity-measurement-app-backend.azurewebsites.net/api/v1/auth/register', {
+  const res = await fetch('http://quantra.us-east-1.elasticbeanstalk.com/api/v1/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ firstName, lastName, email, password }),
