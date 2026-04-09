@@ -14,6 +14,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
 <link rel="stylesheet" href="css/style.css"/>
+<style>
+.pw-wrap{position:relative;display:flex;align-items:center;}
+.pw-wrap .form-input{flex:1;padding-right:44px;}
+.pw-toggle{position:absolute;right:12px;background:none;border:none;cursor:pointer;color:var(--text2);display:flex;align-items:center;padding:0;transition:color .2s;}
+.pw-toggle:hover{color:var(--accent);}
+</style>
 </head>
 <body>
 <div id="cursor"></div>
@@ -74,7 +80,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">PASSWORD</label>
-        <input class="form-input" type="password" id="reg-password" placeholder="8+ chars, upper, lower, digit, special" autocomplete="new-password"/>
+        <div class="pw-wrap"><input class="form-input" type="password" id="reg-password" placeholder="8+ chars, upper, lower, digit, special" autocomplete="new-password"/><button class="pw-toggle" type="button" onclick="togglePw('reg-password',this)" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
         <span class="form-error" id="reg-pass-err"></span>
       </div>
       <button class="auth-submit" id="reg-btn" onclick="doRegister()">Create account</button>
@@ -91,5 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (isAuthed()) location.href = 'operations.html';
 });
 </script>
+<script src="js/pw-toggle.js"></script>
 </body>
 </html>
