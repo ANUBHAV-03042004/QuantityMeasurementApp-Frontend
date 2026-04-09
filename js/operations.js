@@ -20,7 +20,6 @@ let historyFilter = 'ALL';
 document.addEventListener('DOMContentLoaded', () => {
   updateUnits();
   renderHistorySection();
-  // Apply initial op UI state
   const activeBtn = document.querySelector('.op-btn.active');
   if (activeBtn) selectOp(activeBtn, activeBtn.dataset.op || 'COMPARE');
 });
@@ -35,20 +34,24 @@ function selectOp(el, op) {
   document.getElementById('op-desc').textContent   = meta.desc;
   document.getElementById('op-symbol').textContent = meta.symbol;
   document.getElementById('result-card').classList.remove('show');
-  // For CONVERT: hide second value input, show only "Convert To" unit label
-  const val2Block = document.querySelector('.operand-block:last-of-type');
-  const val2Input = document.getElementById('val2');
-  const secondLabel = document.querySelector('.operand-block:last-of-type .form-label');
-  if (op === 'CONVERT') {
-    if (val2Input) val2Input.style.display = 'none';
-    if (secondLabel) secondLabel.textContent = 'CONVERT TO';
-  } else {
-    if (val2Input) val2Input.style.display = '';
-    if (secondLabel) secondLabel.textContent = 'SECOND QUANTITY';
-  }
-  if (val2Block) val2Block.style.display = '';
   if (typeof gsap !== 'undefined')
     gsap.fromTo('#op-title', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: .3, ease: 'power2.out' });
+
+  // CONVERT: hide val2 input + label, show only unit2 with "CONVERT TO" label
+  const secondBlock = document.querySelector('.operand-block:last-of-type');
+  const val2Input   = document.getElementById('val2');
+  const secondLabel = secondBlock ? secondBlock.querySelector('.form-label') : null;
+  const opSymbol    = document.getElementById('op-symbol');
+
+  if (op === 'CONVERT') {
+    if (val2Input)   { val2Input.style.display = 'none'; val2Input.value = '0'; }
+    if (secondLabel)   secondLabel.textContent = 'CONVERT TO';
+    if (opSymbol)      opSymbol.style.display  = 'none';
+  } else {
+    if (val2Input)   { val2Input.style.display = ''; }
+    if (secondLabel)   secondLabel.textContent = 'SECOND QUANTITY';
+    if (opSymbol)      opSymbol.style.display  = '';
+  }
 }
 
 function selectFilter(el, filter) {
@@ -75,16 +78,13 @@ async function runOperation() {
   const unit2 = document.getElementById('unit2').value;
   const mtype = document.getElementById('mtype').value;
 
-  // CONVERT only needs val1 and target unit (unit2); val2 is irrelevant
-  if (currentOp === 'CONVERT') val2Input_val = 0;
-  else val2Input_val = val2;
+  const val2Final = currentOp === 'CONVERT' ? 0 : val2;
   if (isNaN(val1) || (currentOp !== 'CONVERT' && isNaN(val2))) { toast('Enter valid numbers', 'error'); return; }
 
   const btn = document.getElementById('run-btn');
   btn.innerHTML = '<span class="loader"></span>';
   btn.disabled  = true;
 
-  const val2Final = currentOp === 'CONVERT' ? 0 : val2;
   const body = {
     thisQuantityDTO: { value: val1, unit: unit1, measurementType: mtype },
     thatQuantityDTO: { value: val2Final, unit: unit2, measurementType: mtype },
@@ -142,13 +142,10 @@ function showResult(data) {
     const val = Number.isInteger(data.resultValue) ? data.resultValue : parseFloat(data.resultValue.toFixed(6));
     rv.textContent = val;
     ru.textContent = data.resultUnit || '';
-    const toDisplay = currentOp === 'CONVERT'
-      ? `${data.resultValue} ${data.resultUnit}`
-      : (data.thatValue != null ? data.thatValue + ' ' + (data.thatUnit || '') : '—');
     rm.innerHTML = `
       <div class="result-meta-item"><div class="result-meta-key">OPERATION</div><div class="result-meta-val">${data.operation || '—'}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">FROM</div><div class="result-meta-val">${data.thisValue} ${data.thisUnit}</div></div>
-      <div class="result-meta-item"><div class="result-meta-key">TO</div><div class="result-meta-val">${toDisplay}</div></div>
+      <div class="result-meta-item"><div class="result-meta-key">TO</div><div class="result-meta-val">${data.thatValue != null ? data.thatValue + ' ' + (data.thatUnit || '') : '—'}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">TYPE</div><div class="result-meta-val">${data.thisMeasurementType || '—'}</div></div>`;
   }
 
