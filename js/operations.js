@@ -20,9 +20,9 @@ let historyFilter = 'ALL';
 document.addEventListener('DOMContentLoaded', () => {
   updateUnits();
   renderHistorySection();
-  // Apply initial op UI state (e.g. if default were CONVERT)
+  // Apply initial op UI state
   const activeBtn = document.querySelector('.op-btn.active');
-  if (activeBtn) selectOp(activeBtn, activeBtn.dataset.op);
+  if (activeBtn) selectOp(activeBtn, activeBtn.dataset.op || 'COMPARE');
 });
 
 /* ── Operation selection ─────────────────────────────────────────────────── */
@@ -35,14 +35,18 @@ function selectOp(el, op) {
   document.getElementById('op-desc').textContent   = meta.desc;
   document.getElementById('op-symbol').textContent = meta.symbol;
   document.getElementById('result-card').classList.remove('show');
-  // For CONVERT, hide second value — only target unit matters
+  // For CONVERT: hide second value input, show only "Convert To" unit label
   const val2Block = document.querySelector('.operand-block:last-of-type');
   const val2Input = document.getElementById('val2');
+  const secondLabel = document.querySelector('.operand-block:last-of-type .form-label');
   if (op === 'CONVERT') {
-    if (val2Block) val2Block.style.display = 'none';
+    if (val2Input) val2Input.style.display = 'none';
+    if (secondLabel) secondLabel.textContent = 'CONVERT TO';
   } else {
-    if (val2Block) val2Block.style.display = '';
+    if (val2Input) val2Input.style.display = '';
+    if (secondLabel) secondLabel.textContent = 'SECOND QUANTITY';
   }
+  if (val2Block) val2Block.style.display = '';
   if (typeof gsap !== 'undefined')
     gsap.fromTo('#op-title', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: .3, ease: 'power2.out' });
 }
