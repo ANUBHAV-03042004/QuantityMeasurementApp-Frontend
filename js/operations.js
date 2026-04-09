@@ -19,7 +19,10 @@ let historyFilter = 'ALL';
 /* ── Init ──────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   updateUnits();
-  renderHistorySection();   // show auth gate or load history
+  renderHistorySection();
+  // Apply initial op UI state (e.g. if default were CONVERT)
+  const activeBtn = document.querySelector('.op-btn.active');
+  if (activeBtn) selectOp(activeBtn, activeBtn.dataset.op);
 });
 
 /* ── Operation selection ─────────────────────────────────────────────────── */
@@ -32,11 +35,14 @@ function selectOp(el, op) {
   document.getElementById('op-desc').textContent   = meta.desc;
   document.getElementById('op-symbol').textContent = meta.symbol;
   document.getElementById('result-card').classList.remove('show');
-  // Hide second operand for CONVERT — only need target unit
-  const secondOp = document.getElementById('second-operand');
-  if (secondOp) secondOp.style.display = op === 'CONVERT' ? 'none' : '';
-  const opSymbol = document.getElementById('op-symbol');
-  if (opSymbol) opSymbol.style.display = op === 'CONVERT' ? 'none' : '';
+  // For CONVERT, hide second value — only target unit matters
+  const val2Block = document.querySelector('.operand-block:last-of-type');
+  const val2Input = document.getElementById('val2');
+  if (op === 'CONVERT') {
+    if (val2Block) val2Block.style.display = 'none';
+  } else {
+    if (val2Block) val2Block.style.display = '';
+  }
   if (typeof gsap !== 'undefined')
     gsap.fromTo('#op-title', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: .3, ease: 'power2.out' });
 }
@@ -65,16 +71,19 @@ async function runOperation() {
   const unit2 = document.getElementById('unit2').value;
   const mtype = document.getElementById('mtype').value;
 
-  if (isNaN(val1)) { toast('Enter a valid number', 'error'); return; }
-  if (currentOp !== 'CONVERT' && isNaN(val2)) { toast('Enter valid numbers', 'error'); return; }
+  // CONVERT only needs val1 and target unit (unit2); val2 is irrelevant
+  if (currentOp === 'CONVERT') val2Input_val = 0;
+  else val2Input_val = val2;
+  if (isNaN(val1) || (currentOp !== 'CONVERT' && isNaN(val2))) { toast('Enter valid numbers', 'error'); return; }
 
   const btn = document.getElementById('run-btn');
   btn.innerHTML = '<span class="loader"></span>';
   btn.disabled  = true;
 
+  const val2Final = currentOp === 'CONVERT' ? 0 : val2;
   const body = {
     thisQuantityDTO: { value: val1, unit: unit1, measurementType: mtype },
-    thatQuantityDTO: { value: val2, unit: unit2, measurementType: mtype },
+    thatQuantityDTO: { value: val2Final, unit: unit2, measurementType: mtype },
   };
 
   try {
@@ -129,11 +138,14 @@ function showResult(data) {
     const val = Number.isInteger(data.resultValue) ? data.resultValue : parseFloat(data.resultValue.toFixed(6));
     rv.textContent = val;
     ru.textContent = data.resultUnit || '';
+    const toDisplay = currentOp === 'CONVERT'
+      ? `${data.resultValue} ${data.resultUnit}`
+      : (data.thatValue != null ? data.thatValue + ' ' + (data.thatUnit || '') : '—');
     rm.innerHTML = `
       <div class="result-meta-item"><div class="result-meta-key">OPERATION</div><div class="result-meta-val">${data.operation || '—'}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">FROM</div><div class="result-meta-val">${data.thisValue} ${data.thisUnit}</div></div>
-      <div class="result-meta-item"><div class="result-meta-key">TO</div><div class="result-meta-val">${data.thatValue != null ? data.thatValue + ' ' + (data.thatUnit || '') : '—'}</div></div>
-      <div class="result-meta-item"><div class="result-meta-key">MEASUREMENT TYPE</div><div class="result-meta-val">${(data.thisMeasurementType || '—').replace('Unit','')}</div></div>`;
+      <div class="result-meta-item"><div class="result-meta-key">TO</div><div class="result-meta-val">${toDisplay}</div></div>
+      <div class="result-meta-item"><div class="result-meta-key">TYPE</div><div class="result-meta-val">${data.thisMeasurementType || '—'}</div></div>`;
   }
 
   if (typeof gsap !== 'undefined')
