@@ -32,6 +32,11 @@ function selectOp(el, op) {
   document.getElementById('op-desc').textContent   = meta.desc;
   document.getElementById('op-symbol').textContent = meta.symbol;
   document.getElementById('result-card').classList.remove('show');
+  // Hide second operand for CONVERT — only need target unit
+  const secondOp = document.getElementById('second-operand');
+  if (secondOp) secondOp.style.display = op === 'CONVERT' ? 'none' : '';
+  const opSymbol = document.getElementById('op-symbol');
+  if (opSymbol) opSymbol.style.display = op === 'CONVERT' ? 'none' : '';
   if (typeof gsap !== 'undefined')
     gsap.fromTo('#op-title', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: .3, ease: 'power2.out' });
 }
@@ -60,7 +65,8 @@ async function runOperation() {
   const unit2 = document.getElementById('unit2').value;
   const mtype = document.getElementById('mtype').value;
 
-  if (isNaN(val1) || isNaN(val2)) { toast('Enter valid numbers', 'error'); return; }
+  if (isNaN(val1)) { toast('Enter a valid number', 'error'); return; }
+  if (currentOp !== 'CONVERT' && isNaN(val2)) { toast('Enter valid numbers', 'error'); return; }
 
   const btn = document.getElementById('run-btn');
   btn.innerHTML = '<span class="loader"></span>';
@@ -127,7 +133,7 @@ function showResult(data) {
       <div class="result-meta-item"><div class="result-meta-key">OPERATION</div><div class="result-meta-val">${data.operation || '—'}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">FROM</div><div class="result-meta-val">${data.thisValue} ${data.thisUnit}</div></div>
       <div class="result-meta-item"><div class="result-meta-key">TO</div><div class="result-meta-val">${data.thatValue != null ? data.thatValue + ' ' + (data.thatUnit || '') : '—'}</div></div>
-      <div class="result-meta-item"><div class="result-meta-key">TYPE</div><div class="result-meta-val">${data.thisMeasurementType || '—'}</div></div>`;
+      <div class="result-meta-item"><div class="result-meta-key">MEASUREMENT TYPE</div><div class="result-meta-val">${(data.thisMeasurementType || '—').replace('Unit','')}</div></div>`;
   }
 
   if (typeof gsap !== 'undefined')

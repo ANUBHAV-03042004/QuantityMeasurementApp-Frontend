@@ -1,5 +1,5 @@
 /* ── Shared state ─────────────────────────────────────────────────────────── */
-const API = 'http://quantra.us-east-1.elasticbeanstalk.com/api/v1';
+const API = 'https://quantra.us-east-1.elasticbeanstalk.com/api/v1';
 
 const state = {
   token: localStorage.getItem('qm_token') || null,
@@ -78,6 +78,13 @@ function toast(msg, type = 'info') {
   setTimeout(() => gsap.to(el, { x: '120%', duration: .3, onComplete: () => el.remove() }), 3000);
 }
 
+/* ── Cursor — event delegation so dynamically-inserted elements work ─────── */
+// querySelectorAll() at init only captures elements already in the DOM.
+// Pages like Operations/Dashboard/Profile inject most interactive content
+// (history rows, dashboard cards, auth-gate buttons) after DOMContentLoaded,
+// so those elements never received hover listeners and the cursor stayed static.
+// Event delegation on document catches every hover regardless of when the
+// element was inserted — fixing cursor on all pages.
 function initCursor() {
   if (typeof gsap === 'undefined') return;
   const cur  = document.getElementById('cursor');
