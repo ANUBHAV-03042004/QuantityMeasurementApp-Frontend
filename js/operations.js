@@ -46,11 +46,11 @@ function selectOp(el, op) {
   if (op === 'CONVERT') {
     if (val2Input)   { val2Input.style.display = 'none'; val2Input.value = '0'; }
     if (secondLabel)   secondLabel.textContent = 'CONVERT TO';
-    if (opSymbol)      opSymbol.style.display  = 'none';
+    if (opSymbol)    { opSymbol.textContent = '→'; opSymbol.style.display = ''; }
   } else {
     if (val2Input)   { val2Input.style.display = ''; }
     if (secondLabel)   secondLabel.textContent = 'SECOND QUANTITY';
-    if (opSymbol)      opSymbol.style.display  = '';
+    if (opSymbol)    { opSymbol.textContent = meta.symbol; opSymbol.style.display = ''; }
   }
 }
 
