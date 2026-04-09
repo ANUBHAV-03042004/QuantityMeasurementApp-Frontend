@@ -1,5 +1,5 @@
 /* ── Shared state ─────────────────────────────────────────────────────────── */
-const API = 'https://quantra.us-east-1.elasticbeanstalk.com/api/v1';
+const API = 'https://dpvh78pj77mvc.cloudfront.net/api/v1';
 
 const state = {
   token: localStorage.getItem('qm_token') || null,
