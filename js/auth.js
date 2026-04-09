@@ -2,7 +2,7 @@
 function loginWithGoogle() {
   // Spring Security handles the full OAuth2 flow; backend redirects to
   // oauth2-callback.html with ?token=<jwt> on success.
- window.location.href = 'http://quantra.us-east-1.elasticbeanstalk.com/oauth2/authorization/google';
+ window.location.href = 'http://quantra.us-east-1.elasticbeanstalk.com/oauth2/authorization/google?frontend=legacy';
 }
 // Google OAuth — change:
 
