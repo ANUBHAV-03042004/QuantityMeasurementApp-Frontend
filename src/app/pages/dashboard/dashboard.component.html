@@ -18,26 +18,34 @@
     <ng-container *ngIf="isAuth">
       <div class="dash-grid">
         <div class="dash-card">
-          <div class="dash-card-icon">🔮</div>
-          <div class="dash-card-label">TOTAL SPELLS</div>
+          <div class="dash-card-header">
+            <div class="dash-card-label">TOTAL SPELLS</div>
+            <div class="dash-card-icon">🔮</div>
+          </div>
           <div class="dash-card-val" id="d-total">—</div>
           <div class="dash-card-sub">All time casts</div>
         </div>
         <div class="dash-card">
-          <div class="dash-card-icon">⟺</div>
-          <div class="dash-card-label">COMPARES</div>
+          <div class="dash-card-header">
+            <div class="dash-card-label">COMPARES</div>
+            <div class="dash-card-icon">⟺</div>
+          </div>
           <div class="dash-card-val" id="d-compare">—</div>
           <div class="dash-card-sub">Truth spells</div>
         </div>
         <div class="dash-card">
-          <div class="dash-card-icon">→</div>
-          <div class="dash-card-label">CONVERTS</div>
+          <div class="dash-card-header">
+            <div class="dash-card-label">CONVERTS</div>
+            <div class="dash-card-icon">→</div>
+          </div>
           <div class="dash-card-val" id="d-convert">—</div>
           <div class="dash-card-sub">Transform spells</div>
         </div>
         <div class="dash-card">
-          <div class="dash-card-icon">⚠</div>
-          <div class="dash-card-label">CURSES</div>
+          <div class="dash-card-header">
+            <div class="dash-card-label">CURSES</div>
+            <div class="dash-card-icon">⚠</div>
+          </div>
           <div class="dash-card-val" id="d-errors" style="color:var(--fire-red)">—</div>
           <div class="dash-card-sub">Failed attempts</div>
         </div>
