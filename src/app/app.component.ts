@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { CursorComponent } from './shared/cursor/cursor.component';
 import { LoaderComponent } from './shared/loader/loader.component';
 import { ToastComponent } from './shared/toast/toast.component';
+import { inject } from '@vercel/analytics';
 
 @Component({
   selector: 'app-root',
@@ -66,4 +67,8 @@ import { ToastComponent } from './shared/toast/toast.component';
     .gc--right2 { right:240px; font-size:24px; }
   `]
 })
-export class AppComponent {}
+export class AppComponent implements OnInit {
+  ngOnInit(): void {
+    inject();
+  }
+}
