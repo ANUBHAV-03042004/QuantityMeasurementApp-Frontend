@@ -511,12 +511,12 @@ nav {
   .dash-title { font-family: var(--font-title); font-size: 14px; margin-bottom: 6px; color: var(--fire-red); }
   .dash-sub   { font-family: var(--font-body); font-size: 17px; color: #888; }
 }
-.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; align-items: stretch; }
+.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; align-items: start; }
 .dash-card {
   padding: 20px; background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
   cursor: none; transition: transform .1s, box-shadow .1s;
   box-sizing: border-box; position: relative;
-  display: flex; flex-direction: column; min-height: 150px;
+  display: flex; flex-direction: column; height: 160px;
   &:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
 }
 .dash-card-header {
@@ -530,7 +530,7 @@ nav {
   opacity: 0.7;
 }
 .dash-card-val { font-family: var(--font-title); font-size: 26px; color: var(--fire-red); line-height: 1; margin-bottom: 6px; }
-.dash-card-sub { font-family: var(--font-body); font-size: 14px; color: #aaa; margin-top: auto; }
+.dash-card-sub { font-family: var(--font-body); font-size: 14px; color: #aaa; margin-top: 8px; }
 .dash-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .dash-panel {
   padding: 20px; background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
