@@ -30,9 +30,9 @@
           </div>
           <div class="op-symbol">{{ meta.symbol }}</div>
           <div class="operand-block">
-            <label class="form-label">🛡️ SECOND QUANTITY</label>
+            <label class="form-label">{{ isConvert ? '🎯 TARGET UNIT' : '🛡️ SECOND QUANTITY' }}</label>
             <div class="input-row">
-              <input class="form-input" type="number" [(ngModel)]="val2" placeholder="0" step="any"/>
+              <input class="form-input" type="number" [(ngModel)]="val2" placeholder="0" step="any" *ngIf="!isConvert"/>
               <select class="form-select" [(ngModel)]="unit2">
                 <option *ngFor="let u of units" [value]="u">{{u}}</option>
               </select>
@@ -61,7 +61,7 @@
           <div class="result-meta" *ngIf="currentOp!=='COMPARE'">
             <div class="result-meta-item"><div class="result-meta-key">SPELL</div><div class="result-meta-val">{{ result.operation }}</div></div>
             <div class="result-meta-item"><div class="result-meta-key">FROM</div><div class="result-meta-val">{{ result.thisValue }} {{ result.thisUnit }}</div></div>
-            <div class="result-meta-item"><div class="result-meta-key">REALM</div><div class="result-meta-val">{{ result.thisMeasurementType }}</div></div>
+            <div class="result-meta-item"><div class="result-meta-key">REALM</div><div class="result-meta-val">{{ cleanType(result.thisMeasurementType) }}</div></div>
           </div>
         </ng-container>
         <ng-container *ngIf="result.error">
@@ -98,7 +98,7 @@
               <td>{{ r.thisValue }} {{ r.thisUnit }}</td>
               <td>{{ r.thatValue != null ? r.thatValue + ' ' + r.thatUnit : '—' }}</td>
               <td style="color:var(--fire-red)">{{ formatResult(r) }}</td>
-              <td style="font-size:14px;color:#aaa">{{ r.thisMeasurementType }}</td>
+              <td style="font-size:14px;color:#aaa">{{ cleanType(r.thisMeasurementType) }}</td>
               <td>
                 <span class="err-badge" *ngIf="r.error">CURSED</span>
                 <span style="color:var(--forest-mid);font-family:var(--font-title);font-size:6px" *ngIf="!r.error">✓ OK</span>

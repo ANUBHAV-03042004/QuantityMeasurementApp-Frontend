@@ -64,8 +64,13 @@ export class OperationsComponent implements OnInit, AfterViewInit {
 
   selectOp(op: string) {
     this.currentOp = op; this.result = null;
+    if (op === 'CONVERT') {
+      this.val2 = '0'; // value irrelevant for convert, only unit2 matters
+    }
     gsap.fromTo('.ops-title', { x: -16, opacity: 0 }, { x: 0, opacity: 1, duration: .3, ease: 'power2.out' });
   }
+
+  get isConvert() { return this.currentOp === 'CONVERT'; }
 
   selectFilter(f: string) {
     this.histFilter = f;
@@ -78,8 +83,10 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   }
 
   runOperation() {
-    const v1 = parseFloat(this.val1), v2 = parseFloat(this.val2);
-    if (isNaN(v1)||isNaN(v2)) { this.toast.show('Enter valid numbers','error'); return; }
+    const v1 = parseFloat(this.val1);
+    const v2 = this.currentOp === 'CONVERT' ? 0 : parseFloat(this.val2);
+    if (isNaN(v1)) { this.toast.show('Enter a valid number','error'); return; }
+    if (this.currentOp !== 'CONVERT' && isNaN(v2)) { this.toast.show('Enter valid numbers','error'); return; }
     this.running = true;
     const body = {
       thisQuantityDTO: { value:v1, unit:this.unit1, measurementType:this.mtype },
@@ -131,6 +138,10 @@ export class OperationsComponent implements OnInit, AfterViewInit {
     }
     const v = Number.isInteger(this.result.resultValue) ? this.result.resultValue : parseFloat((this.result.resultValue||0).toFixed(6));
     return { val: v, color: 'var(--accent)', unit: this.result.resultUnit||'' };
+  }
+
+  cleanType(raw: string): string {
+    return raw ? raw.replace('Unit', '') : '';
   }
 
   formatResult(r: any): string {
