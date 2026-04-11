@@ -17,7 +17,7 @@ import { gsap } from 'gsap';
 export class LoginComponent implements AfterViewInit {
   email = ''; password = ''; loading = false;
   emailErr = ''; passErr = '';
-  private BASE = 'https://quantity-measurement-app-backend.azurewebsites.net/api/v1';
+  private BASE = 'https://dpvh78pj77mvc.cloudfront.net/api/v1';
   private auth   = inject(AuthService);
   private toast  = inject(ToastService);
   private http   = inject(HttpClient);
@@ -40,11 +40,11 @@ export class LoginComponent implements AfterViewInit {
       { withCredentials: true }
     ).subscribe({
       next: () => {
-        window.location.href = 'https://quantity-measurement-app-backend.azurewebsites.net/oauth2/authorization/google';
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
       },
       error: () => {
         // Even if registration fails, still try the OAuth flow — it'll use the fallback
-        window.location.href = 'https://quantity-measurement-app-backend.azurewebsites.net/oauth2/authorization/google';
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
       }
     });
   }

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  readonly base = 'https://quantity-measurement-app-backend.azurewebsites.net/api/v1';
+  readonly base = 'https://dpvh78pj77mvc.cloudfront.net/api/v1';
 
   constructor(private http: HttpClient) {}
 

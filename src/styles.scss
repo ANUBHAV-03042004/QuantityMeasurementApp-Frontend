@@ -157,11 +157,7 @@ nav {
     display: flex; align-items: center; gap: 8px; padding: 0 20px;
     border-right: var(--border-w) solid var(--ink);
     text-decoration: none; cursor: none;
-    .logo-dragon { 
-  position: relative;
-  top: -5px;
-  font-size: 22px;
- }
+    .logo-dragon { font-size: 22px; }
     .logo-text {
       font-family: var(--font-title); font-size: 9px; color: var(--ink);
       em { color: var(--fire-red); font-style: normal; }

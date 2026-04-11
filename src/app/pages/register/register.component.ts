@@ -17,7 +17,7 @@ import { gsap } from 'gsap';
 export class RegisterComponent implements AfterViewInit {
   firstName=''; lastName=''; email=''; password='';
   loading=false; firstErr=''; lastErr=''; emailErr=''; passErr='';
-  private BASE = 'https://quantity-measurement-app-backend.azurewebsites.net/api/v1';
+  private BASE = 'https://dpvh78pj77mvc.cloudfront.net/api/v1';
   private auth   = inject(AuthService);
   private toast  = inject(ToastService);
   private http   = inject(HttpClient);
@@ -38,10 +38,10 @@ export class RegisterComponent implements AfterViewInit {
       { withCredentials: true }
     ).subscribe({
       next: () => {
-        window.location.href = 'https://quantity-measurement-app-backend.azurewebsites.net/oauth2/authorization/google';
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
       },
       error: () => {
-        window.location.href = 'https://quantity-measurement-app-backend.azurewebsites.net/oauth2/authorization/google';
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
       }
     });
   }
