@@ -33,10 +33,11 @@ export class LoginComponent implements AfterViewInit {
   }
 
   loginWithGoogle() {
-    // ?frontend=angular tells OAuth2FrontendHintFilter to save the hint in
-    // the session + cookie so OAuth2SuccessHandler redirects back to Vercel,
-    // not to the legacy GitHub Pages frontend.
-    window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google?frontend=angular';
+    // /api/v1/auth/oauth2-start stores the "angular" hint in session + cookie
+    // on the SAME request (before Spring's OAuth2 filter runs), then server-side
+    // redirects to /oauth2/authorization/google.
+    // This bypasses the CloudFront query-param stripping issue entirely.
+    window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/api/v1/auth/oauth2-start?frontend=angular';
   }
 
   doLogin() {
