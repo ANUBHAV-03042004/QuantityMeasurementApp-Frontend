@@ -33,11 +33,20 @@ export class LoginComponent implements AfterViewInit {
   }
 
   loginWithGoogle() {
-    // /api/v1/auth/oauth2-start stores the "angular" hint in session + cookie
-    // on the SAME request (before Spring's OAuth2 filter runs), then server-side
-    // redirects to /oauth2/authorization/google.
-    // This bypasses the CloudFront query-param stripping issue entirely.
-    window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/api/v1/auth/oauth2-start?frontend=angular';
+    // Tell the backend which frontend is initiating the OAuth flow FIRST
+    // so it can redirect the token back to the correct GitHub Pages URL
+    this.http.post(`${this.BASE}/auth/oauth2-origin`,
+      { origin: window.location.origin },
+      { withCredentials: true }
+    ).subscribe({
+      next: () => {
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/api/v1/auth/oauth2-start?frontend=angular';
+      },
+      error: () => {
+        // Even if registration fails, still try the OAuth flow — it'll use the fallback
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/api/v1/auth/oauth2-start?frontend=angular';
+      }
+    });
   }
 
   doLogin() {

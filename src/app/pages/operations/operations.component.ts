@@ -52,13 +52,7 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   private toast = inject(ToastService);
   constructor(@Inject(PLATFORM_ID) private pid: Object) {}
 
-  get isAuth()     { return this.auth.isAuth(); }
-  get isConvert()  { return this.currentOp === 'CONVERT'; }
-
-  /** Strips "Unit" suffix so "LengthUnit" → "LENGTH", "WeightUnit" → "WEIGHT" */
-  cleanType(t: string): string {
-    return (t || '').replace(/Unit$/i, '').toUpperCase();
-  }
+  get isAuth() { return this.auth.isAuth(); }
 
   ngOnInit() { this.updateUnits(); if (this.isAuth) this.loadHistory(); }
 
@@ -84,11 +78,8 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   }
 
   runOperation() {
-    const v1 = parseFloat(this.val1);
-    if (isNaN(v1)) { this.toast.show('Enter a valid number','error'); return; }
-    // CONVERT only needs a source value + two units — no second quantity value
-    const v2 = this.isConvert ? 0 : parseFloat(this.val2);
-    if (!this.isConvert && isNaN(v2)) { this.toast.show('Enter valid numbers','error'); return; }
+    const v1 = parseFloat(this.val1), v2 = parseFloat(this.val2);
+    if (isNaN(v1)||isNaN(v2)) { this.toast.show('Enter valid numbers','error'); return; }
     this.running = true;
     const body = {
       thisQuantityDTO: { value:v1, unit:this.unit1, measurementType:this.mtype },
