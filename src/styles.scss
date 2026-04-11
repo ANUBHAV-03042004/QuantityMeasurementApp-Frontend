@@ -511,12 +511,12 @@ nav {
   .dash-title { font-family: var(--font-title); font-size: 14px; margin-bottom: 6px; color: var(--fire-red); }
   .dash-sub   { font-family: var(--font-body); font-size: 17px; color: #888; }
 }
-.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; }
+.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; align-items: start; }
 .dash-card {
   background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
   cursor: none; transition: transform .1s, box-shadow .1s;
   box-sizing: border-box; position: relative;
-  height: 160px; overflow: hidden;
+  height: 160px !important; min-height: unset !important; max-height: 160px !important; overflow: hidden;
   &:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
 }
 .dash-card-header {
