@@ -1,0 +1,51 @@
+<div class="page-wrap">
+  <div *ngIf="loading" class="cb-wrap">
+    <div class="cb-spinner">🐲</div>
+    <div class="cb-title">SUMMONING YOUR SCROLL...</div>
+    <div class="cb-sub">The dragon retrieves your legend...</div>
+  </div>
+
+  <div class="profile-outer" *ngIf="!loading && user">
+    <div class="profile-wrap">
+      <div class="profile-hero">
+        <div class="profile-avatar-big">{{ initials }}</div>
+        <div class="profile-info">
+          <h1>{{ user.firstName }} {{ user.lastName }}</h1>
+          <p>{{ user.email }}</p>
+          <div class="profile-badges">
+            <span class="profile-badge badge-role">⚔ {{ user.role }}</span>
+            <span class="profile-badge badge-auth">🌐 {{ user.authProvider }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">📋 KNIGHT'S SCROLL</div>
+        <div class="profile-fields">
+          <div class="profile-field"><div class="profile-field-key">⚔ GIVEN NAME</div><div class="profile-field-val">{{ user.firstName }}</div></div>
+          <div class="profile-field"><div class="profile-field-key">🛡️ FAMILY NAME</div><div class="profile-field-val">{{ user.lastName }}</div></div>
+          <div class="profile-field"><div class="profile-field-key">📜 EMAIL SCROLL</div><div class="profile-field-val">{{ user.email }}</div></div>
+          <div class="profile-field"><div class="profile-field-key">🌐 REALM GATE</div><div class="profile-field-val">{{ user.authProvider }}</div></div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">⚔ LEGEND STATS</div>
+        <div class="profile-stats">
+          <div class="pstat"><div class="pstat-val" id="ps-total">0</div><div class="pstat-key">🔮 TOTAL SPELLS</div></div>
+          <div class="pstat"><div class="pstat-val" id="ps-success">0</div><div class="pstat-key">✓ SUCCESSFUL</div></div>
+          <div class="pstat"><div class="pstat-val" id="ps-errors">0</div><div class="pstat-key">⚠ CURSED</div></div>
+        </div>
+      </div>
+
+      <div class="profile-section" style="text-align:center;background:var(--parchment2)">
+        <p style="font-family:var(--font-body);font-size:18px;color:#888;margin-bottom:16px">
+          🐲 A true knight of the Quantra Kingdom
+        </p>
+        <button class="dragon-btn" style="border-color:var(--fire-red);color:var(--fire-red)" (click)="logout()">
+          ⚔ LEAVE THE REALM
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

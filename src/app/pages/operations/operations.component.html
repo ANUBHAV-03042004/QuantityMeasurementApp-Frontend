@@ -1,0 +1,112 @@
+<div class="page-wrap">
+  <div class="ops-outer">
+    <aside class="ops-sidebar">
+      <h3>🔥 SPELLS</h3>
+      <button *ngFor="let op of ops" class="op-btn" [class.active]="op===currentOp" (click)="selectOp(op)">
+        <span class="op-dot"></span>{{ op }}
+      </button>
+      <h3 style="margin-top:12px">📜 SCROLLS</h3>
+      <button *ngFor="let f of filters" class="type-btn" [class.active]="f===histFilter" (click)="selectFilter(f)">
+        {{ f==='ALL' ? 'ALL SCROLLS' : f==='ERRORED' ? 'CURSED' : f }}
+      </button>
+    </aside>
+
+    <main class="ops-main">
+      <div class="ops-header">
+        <div class="ops-title">🔥 {{ meta.title }}</div>
+        <div class="ops-desc">{{ meta.desc }}</div>
+      </div>
+
+      <div class="op-form-card">
+        <div class="operands-grid">
+          <div class="operand-block">
+            <label class="form-label">⚔ FIRST QUANTITY</label>
+            <div class="input-row">
+              <input class="form-input" type="number" [(ngModel)]="val1" placeholder="0" step="any"/>
+              <select class="form-select" [(ngModel)]="unit1">
+                <option *ngFor="let u of units" [value]="u">{{u}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="op-symbol">{{ meta.symbol }}</div>
+          <div class="operand-block">
+            <label class="form-label">🛡️ SECOND QUANTITY</label>
+            <div class="input-row">
+              <input class="form-input" type="number" [(ngModel)]="val2" placeholder="0" step="any"/>
+              <select class="form-select" [(ngModel)]="unit2">
+                <option *ngFor="let u of units" [value]="u">{{u}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px">
+          <div>
+            <label class="form-label">🌍 DIMENSION REALM</label>
+            <select class="form-select" [(ngModel)]="mtype" (change)="updateUnits()" style="width:180px">
+              <option *ngFor="let t of mtypes" [value]="t">{{ t.replace('Unit','').toUpperCase() }}</option>
+            </select>
+          </div>
+          <button class="run-btn" (click)="runOperation()" [disabled]="running" style="margin-top:18px">
+            <span class="loader" *ngIf="running"></span>
+            <span *ngIf="!running">🔥 CAST SPELL ↗</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="result-card" [class.show]="result" *ngIf="result">
+        <div class="result-label">🔮 ORACLE'S ANSWER</div>
+        <ng-container *ngIf="!result.error">
+          <div class="result-value" [style.color]="resultDisplay()?.color">{{ resultDisplay()?.val }}</div>
+          <div class="result-unit">{{ resultDisplay()?.unit }}</div>
+          <div class="result-meta" *ngIf="currentOp!=='COMPARE'">
+            <div class="result-meta-item"><div class="result-meta-key">SPELL</div><div class="result-meta-val">{{ result.operation }}</div></div>
+            <div class="result-meta-item"><div class="result-meta-key">FROM</div><div class="result-meta-val">{{ result.thisValue }} {{ result.thisUnit }}</div></div>
+            <div class="result-meta-item"><div class="result-meta-key">REALM</div><div class="result-meta-val">{{ result.thisMeasurementType }}</div></div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="result.error">
+          <div class="result-value result-error">⚠ CURSE DETECTED</div>
+          <div class="result-unit">{{ result.errorMessage }}</div>
+        </ng-container>
+      </div>
+
+      <div class="history-section">
+        <div class="history-header">
+          <div class="history-title">📜 SPELL SCROLLS</div>
+          <button class="btn" style="font-size:6px;padding:6px 12px" (click)="isAuth && loadHistory()">↻ REFRESH</button>
+        </div>
+
+        <div *ngIf="!isAuth" class="history-auth-gate">
+          <span class="gate-dragon">🔒</span>
+          <h3>RESTRICTED SCROLL VAULT</h3>
+          <p>Your spell scrolls are sealed by the dragon. Sign in to unlock your history.</p>
+          <div class="btn-row" style="justify-content:center">
+            <a class="dragon-btn btn-fire" routerLink="/login">⚔ ENTER REALM ↗</a>
+            <a class="dragon-btn btn-gold" routerLink="/register">🐲 JOIN KINGDOM</a>
+          </div>
+        </div>
+
+        <div *ngIf="isAuth && histLoading" class="history-empty">🔮 Consulting the oracle...</div>
+        <div *ngIf="isAuth && !histLoading && !history.length" class="history-empty">📜 No scrolls yet. Cast a spell first!</div>
+        <table class="history-table" *ngIf="isAuth && !histLoading && history.length">
+          <thead><tr>
+            <th>SPELL</th><th>FIRST</th><th>SECOND</th><th>RESULT</th><th>REALM</th><th>STATUS</th>
+          </tr></thead>
+          <tbody>
+            <tr *ngFor="let r of history.slice(0,50)">
+              <td><span class="op-badge op-badge--{{r.operation}}">{{r.operation}}</span></td>
+              <td>{{ r.thisValue }} {{ r.thisUnit }}</td>
+              <td>{{ r.thatValue != null ? r.thatValue + ' ' + r.thatUnit : '—' }}</td>
+              <td style="color:var(--fire-red)">{{ formatResult(r) }}</td>
+              <td style="font-size:14px;color:#aaa">{{ r.thisMeasurementType }}</td>
+              <td>
+                <span class="err-badge" *ngIf="r.error">CURSED</span>
+                <span style="color:var(--forest-mid);font-family:var(--font-title);font-size:6px" *ngIf="!r.error">✓ OK</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>

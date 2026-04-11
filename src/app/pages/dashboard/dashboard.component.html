@@ -1,0 +1,100 @@
+<div class="page-wrap">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div class="dash-title">🏰 THE KEEP</div>
+      <div class="dash-sub">{{ isAuth ? '⚔ Knight: ' + auth.user()?.email : '🔒 Sign in to view your kingdom stats' }}</div>
+    </div>
+
+    <div *ngIf="!isAuth" class="gate-card">
+      <span class="gate-icon">🐲</span>
+      <h3>THE DRAGON GUARDS THIS KEEP</h3>
+      <p>Your kingdom stats, spell counts and charts await — but only for true knights of the realm.</p>
+      <div class="btn-row" style="justify-content:center">
+        <a class="dragon-btn btn-fire" routerLink="/login">⚔ ENTER REALM ↗</a>
+        <a class="dragon-btn btn-gold" routerLink="/register">🌟 JOIN KINGDOM</a>
+      </div>
+    </div>
+
+    <ng-container *ngIf="isAuth">
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-icon">🔮</div>
+          <div class="dash-card-label">TOTAL SPELLS</div>
+          <div class="dash-card-val" id="d-total">—</div>
+          <div class="dash-card-sub">All time casts</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-icon">⟺</div>
+          <div class="dash-card-label">COMPARES</div>
+          <div class="dash-card-val" id="d-compare">—</div>
+          <div class="dash-card-sub">Truth spells</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-icon">→</div>
+          <div class="dash-card-label">CONVERTS</div>
+          <div class="dash-card-val" id="d-convert">—</div>
+          <div class="dash-card-sub">Transform spells</div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-icon">⚠</div>
+          <div class="dash-card-label">CURSES</div>
+          <div class="dash-card-val" id="d-errors" style="color:var(--fire-red)">—</div>
+          <div class="dash-card-sub">Failed attempts</div>
+        </div>
+      </div>
+
+      <div class="dash-row">
+        <div class="dash-panel">
+          <h3>⚔ SPELL BREAKDOWN</h3>
+          <div class="bar-chart">
+            <div *ngFor="let b of bars" class="bar-wrap">
+              <div class="bar" [style.background]="b.color" [style.height.px]="b.pct" [title]="b.label+': '+b.val"></div>
+              <span class="bar-lbl">{{b.label}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="dash-panel">
+          <h3>🌍 REALM DISTRIBUTION</h3>
+          <div class="donut-wrap">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(0,0,0,.1)" stroke-width="16"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="var(--fire-red)" stroke-width="16"
+                [attr.stroke-dasharray]="arcs[0].dash + ' ' + (276 - arcs[0].dash)"
+                [attr.stroke-dashoffset]="0" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="var(--fire-gold)" stroke-width="16"
+                [attr.stroke-dasharray]="arcs[1].dash + ' ' + (276 - arcs[1].dash)"
+                [attr.stroke-dashoffset]="-arcs[0].dash" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="var(--dragon-teal)" stroke-width="16"
+                [attr.stroke-dasharray]="arcs[2].dash + ' ' + (276 - arcs[2].dash)"
+                [attr.stroke-dashoffset]="-(arcs[0].dash + arcs[1].dash)" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="var(--stone-light)" stroke-width="16"
+                [attr.stroke-dasharray]="arcs[3].dash + ' ' + (276 - arcs[3].dash)"
+                [attr.stroke-dashoffset]="-(arcs[0].dash + arcs[1].dash + arcs[2].dash)" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--fire-red)"></div>Length</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--fire-gold)"></div>Weight</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--dragon-teal)"></div>Volume</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--stone-light)"></div>Temp</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <h3>📜 RECENT SCROLLS</h3>
+        <div *ngIf="loading" class="history-empty">🔮 The oracle reads the scrolls...</div>
+        <div *ngIf="!loading && !recent.length" class="history-empty">📜 No spells cast yet! Visit the Spells page.</div>
+        <div class="recent-list" *ngIf="!loading && recent.length">
+          <div *ngFor="let r of recent" class="recent-item">
+            <div class="recent-left">
+              <span class="op-badge op-badge--{{r.operation}}">{{r.operation}}</span>
+              <span class="recent-expr">{{r.thisValue}} {{r.thisUnit}} {{opSymbols[r.operation]}} {{r.thatValue != null ? r.thatValue + ' ' + r.thatUnit : ''}}</span>
+            </div>
+            <span class="recent-result">{{getRecentResult(r)}}</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
