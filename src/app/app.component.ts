@@ -5,6 +5,7 @@ import { CursorComponent } from './shared/cursor/cursor.component';
 import { LoaderComponent } from './shared/loader/loader.component';
 import { ToastComponent } from './shared/toast/toast.component';
 import { inject } from '@vercel/analytics';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 
 @Component({
   selector: 'app-root',
@@ -70,5 +71,6 @@ import { inject } from '@vercel/analytics';
 export class AppComponent implements OnInit {
   ngOnInit(): void {
     inject();
+    injectSpeedInsights();
   }
 }
