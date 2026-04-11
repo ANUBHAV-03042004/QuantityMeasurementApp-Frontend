@@ -52,7 +52,13 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   private toast = inject(ToastService);
   constructor(@Inject(PLATFORM_ID) private pid: Object) {}
 
-  get isAuth() { return this.auth.isAuth(); }
+  get isAuth()     { return this.auth.isAuth(); }
+  get isConvert()  { return this.currentOp === 'CONVERT'; }
+
+  /** Strips "Unit" suffix so "LengthUnit" → "LENGTH", "WeightUnit" → "WEIGHT" */
+  cleanType(t: string): string {
+    return (t || '').replace(/Unit$/i, '').toUpperCase();
+  }
 
   ngOnInit() { this.updateUnits(); if (this.isAuth) this.loadHistory(); }
 

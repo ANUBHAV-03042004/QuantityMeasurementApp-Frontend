@@ -33,17 +33,10 @@ export class RegisterComponent implements AfterViewInit {
   }
 
   loginWithGoogle() {
-    this.http.post(`${this.BASE}/auth/oauth2-origin`,
-      { origin: window.location.origin },
-      { withCredentials: true }
-    ).subscribe({
-      next: () => {
-        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
-      },
-      error: () => {
-        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
-      }
-    });
+    // ?frontend=angular tells OAuth2FrontendHintFilter to save the hint in
+    // the session + cookie so OAuth2SuccessHandler redirects back to Vercel,
+    // not to the legacy GitHub Pages frontend.
+    window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google?frontend=angular';
   }
 
   doRegister() {

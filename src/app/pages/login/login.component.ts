@@ -33,20 +33,10 @@ export class LoginComponent implements AfterViewInit {
   }
 
   loginWithGoogle() {
-    // Tell the backend which frontend is initiating the OAuth flow FIRST
-    // so it can redirect the token back to the correct GitHub Pages URL
-    this.http.post(`${this.BASE}/auth/oauth2-origin`,
-      { origin: window.location.origin },
-      { withCredentials: true }
-    ).subscribe({
-      next: () => {
-        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
-      },
-      error: () => {
-        // Even if registration fails, still try the OAuth flow — it'll use the fallback
-        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
-      }
-    });
+    // ?frontend=angular tells OAuth2FrontendHintFilter to save the hint in
+    // the session + cookie so OAuth2SuccessHandler redirects back to Vercel,
+    // not to the legacy GitHub Pages frontend.
+    window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google?frontend=angular';
   }
 
   doLogin() {
