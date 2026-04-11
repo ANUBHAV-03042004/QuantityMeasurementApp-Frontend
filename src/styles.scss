@@ -515,7 +515,7 @@ nav {
 .dash-card {
   padding: 20px; background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
   cursor: none; transition: transform .1s, box-shadow .1s;
-  min-height: 120px; box-sizing: border-box;
+  min-height: 100px; box-sizing: border-box;
   &:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
 }
 .dash-card-label { font-family: var(--font-title); font-size: 5px; color: #aaa; letter-spacing: .12em; margin-bottom: 8px; }
