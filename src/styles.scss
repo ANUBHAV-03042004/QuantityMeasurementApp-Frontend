@@ -157,7 +157,7 @@ nav {
     display: flex; align-items: center; gap: 8px; padding: 0 20px;
     border-right: var(--border-w) solid var(--ink);
     text-decoration: none; cursor: none;
-    .logo-dragon { font-size: 22px; }
+    .logo-dragon { font-size: 22px; margin-top: -10px; }
     .logo-text {
       font-family: var(--font-title); font-size: 9px; color: var(--ink);
       em { color: var(--fire-red); font-style: normal; }
@@ -511,11 +511,10 @@ nav {
   .dash-title { font-family: var(--font-title); font-size: 14px; margin-bottom: 6px; color: var(--fire-red); }
   .dash-sub   { font-family: var(--font-body); font-size: 17px; color: #888; }
 }
-.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; align-items: start; }
+.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; }
 .dash-card {
   padding: 20px; background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
   cursor: none; transition: transform .1s, box-shadow .1s;
-  min-height: 120px; box-sizing: border-box;
   &:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
 }
 .dash-card-label { font-family: var(--font-title); font-size: 5px; color: #aaa; letter-spacing: .12em; margin-bottom: 8px; }
