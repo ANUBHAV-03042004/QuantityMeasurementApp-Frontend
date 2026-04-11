@@ -515,13 +515,22 @@ nav {
 .dash-card {
   padding: 20px; background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
   cursor: none; transition: transform .1s, box-shadow .1s;
-  box-sizing: border-box; position: relative; height: 130px;
+  box-sizing: border-box; position: relative;
+  /* Flex column so all 4 cards stretch to the same height in the grid row */
+  display: flex; flex-direction: column; min-height: 130px;
   &:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
 }
-.dash-card-label { font-family: var(--font-title); font-size: 5px; color: #aaa; letter-spacing: .12em; margin-bottom: 8px; }
-.dash-card-val   { font-family: var(--font-title); font-size: 26px; color: var(--fire-red); line-height: 1; margin-bottom: 6px; }
-.dash-card-sub   { font-family: var(--font-body); font-size: 14px; color: #aaa; }
-.dash-card-icon  { font-size: 20px; position: absolute; top: 14px; right: 14px; }
+.dash-card-header {
+  /* Icon pinned top-right, label fills remaining space */
+  display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;
+}
+.dash-card-label {
+  font-family: var(--font-title); font-size: 5px; color: #aaa; letter-spacing: .12em;
+  padding-top: 2px; /* align with icon top */
+}
+.dash-card-val { font-family: var(--font-title); font-size: 26px; color: var(--fire-red); line-height: 1; margin-bottom: 6px; }
+.dash-card-sub { font-family: var(--font-body); font-size: 14px; color: #aaa; margin-top: auto; }
+.dash-card-icon { font-size: 20px; flex-shrink: 0; line-height: 1; }
 .dash-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .dash-panel {
   padding: 20px; background: var(--parchment); border: var(--border-w) solid var(--ink); box-shadow: var(--shadow-hard);
