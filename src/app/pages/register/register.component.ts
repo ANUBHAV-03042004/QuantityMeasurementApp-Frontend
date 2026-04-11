@@ -38,10 +38,10 @@ export class RegisterComponent implements AfterViewInit {
       { withCredentials: true }
     ).subscribe({
       next: () => {
-        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google?frontend=angular';
       },
       error: () => {
-        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google';
+        window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google?frontend=angular';
       }
     });
   }
