@@ -22,7 +22,12 @@ const OP_SYMBOLS: Record<string, string> = { COMPARE:'=?', CONVERT:'→', ADD:'+
 export class DashboardComponent implements OnInit, AfterViewInit {
   auth = inject(AuthService);
   private api = inject(ApiService);
+
+  // Real values from API
   stats = { total: 0, compare: 0, convert: 0, errors: 0 };
+  // Animated display values - updated via setInterval, no DOM mutation
+  displayStats = { total: 0, compare: 0, convert: 0, errors: 0 };
+
   bars: BarItem[] = [];
   arcs: ArcItem[] = [
     { id:'arc-length', val:0, dash:0, offset:0 },
@@ -63,11 +68,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.stats = { total, compare: d.cmp, convert: d.cnv, errors: d.err.length };
         const max = Math.max(d.cmp, d.cnv, d.add, d.sub, d.div, 1);
         this.bars = [
-          { label:'CMP', val:d.cmp, color:'var(--fire-red)', pct: Math.max(d.cmp/max*100, 4) },
-          { label:'CNV', val:d.cnv, color:'var(--fire-gold)',  pct: Math.max(d.cnv/max*100, 4) },
+          { label:'CMP', val:d.cmp, color:'var(--fire-red)',    pct: Math.max(d.cmp/max*100, 4) },
+          { label:'CNV', val:d.cnv, color:'var(--fire-gold)',   pct: Math.max(d.cnv/max*100, 4) },
           { label:'ADD', val:d.add, color:'var(--dragon-teal)', pct: Math.max(d.add/max*100, 4) },
-          { label:'SUB', val:d.sub, color:'var(--stone-light)',   pct: Math.max(d.sub/max*100, 4) },
-          { label:'DIV', val:d.div, color:'var(--forest-mid)',   pct: Math.max(d.div/max*100, 4) },
+          { label:'SUB', val:d.sub, color:'var(--stone-light)', pct: Math.max(d.sub/max*100, 4) },
+          { label:'DIV', val:d.div, color:'var(--forest-mid)',  pct: Math.max(d.div/max*100, 4) },
         ];
         const circ = 276;
         const typeTot = d.len.length + d.wgt.length + d.vol.length + d.tmp.length || 1;
@@ -85,7 +90,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         });
         this.recent = (d.rec as any[][]).flat().sort((a: any, b: any) => (b.id||0) - (a.id||0)).slice(0, 6);
         this.loading = false;
-        if (this.isBrowser) setTimeout(() => this.animateStats(), 50);
+        if (this.isBrowser) this.animateCounters();
       },
       error: () => { this.loading = false; }
     });
@@ -96,20 +101,28 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     gsap.from('.dash-header', { y: 20, opacity: 0, duration: .5, ease: 'expo.out', delay: .1 });
   }
 
-  private animateStats() {
-    const animate = (id: string, target: number) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      gsap.to({ val: 0 }, { val: target, duration: 1.2, ease: 'power2.out',
-        onUpdate: function() { el.textContent = String(Math.round((this as any)['targets']()[0].val)); }
-      });
-    };
-    animate('d-total',   this.stats.total);
-    animate('d-compare', this.stats.compare);
-    animate('d-convert', this.stats.convert);
-    animate('d-errors',  this.stats.errors);
-    gsap.from('.dash-card',   { y: 20, opacity: 0, stagger: .08, duration: .5, ease: 'expo.out' });
-    gsap.from('.recent-item', { x: -16, opacity: 0, stagger: .06, duration: .4, ease: 'power2.out', delay: .3 });
+  // Counter animation using Angular bindings only — zero DOM mutation, zero reflow
+  private animateCounters() {
+    const duration = 1200; // ms
+    const steps = 40;
+    const interval = duration / steps;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      // ease out quad
+      const eased = 1 - Math.pow(1 - progress, 2);
+      this.displayStats = {
+        total:   Math.round(this.stats.total   * eased),
+        compare: Math.round(this.stats.compare * eased),
+        convert: Math.round(this.stats.convert * eased),
+        errors:  Math.round(this.stats.errors  * eased),
+      };
+      if (step >= steps) {
+        this.displayStats = { ...this.stats };
+        clearInterval(timer);
+      }
+    }, interval);
   }
 
   getRecentResult(r: any): string {
