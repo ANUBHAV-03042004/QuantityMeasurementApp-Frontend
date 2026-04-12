@@ -73,7 +73,12 @@
       <div class="history-section">
         <div class="history-header">
           <div class="history-title">📜 SPELL SCROLLS</div>
-          <button class="btn" style="font-size:6px;padding:6px 12px" (click)="isAuth && loadHistory()">↻ REFRESH</button>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span *ngIf="history.length" style="font-family:var(--font-title);font-size:6px;color:#aaa">
+              {{ history.length }} SCROLLS
+            </span>
+            <button class="btn" style="font-size:6px;padding:6px 12px" (click)="isAuth && loadHistory()">↻ REFRESH</button>
+          </div>
         </div>
 
         <div *ngIf="!isAuth" class="history-auth-gate">
@@ -88,24 +93,37 @@
 
         <div *ngIf="isAuth && histLoading" class="history-empty">🔮 Consulting the oracle...</div>
         <div *ngIf="isAuth && !histLoading && !history.length" class="history-empty">📜 No scrolls yet. Cast a spell first!</div>
-        <table class="history-table" *ngIf="isAuth && !histLoading && history.length">
-          <thead><tr>
-            <th>SPELL</th><th>FIRST</th><th>SECOND</th><th>RESULT</th><th>REALM</th><th>STATUS</th>
-          </tr></thead>
-          <tbody>
-            <tr *ngFor="let r of history.slice(0,50)">
-              <td><span class="op-badge op-badge--{{r.operation}}">{{r.operation}}</span></td>
-              <td>{{ r.thisValue }} {{ r.thisUnit }}</td>
-              <td>{{ r.thatValue != null ? r.thatValue + ' ' + r.thatUnit : '—' }}</td>
-              <td style="color:var(--fire-red)">{{ formatResult(r) }}</td>
-              <td style="font-size:14px;color:#aaa">{{ cleanType(r.thisMeasurementType) }}</td>
-              <td>
-                <span class="err-badge" *ngIf="r.error">CURSED</span>
-                <span style="color:var(--forest-mid);font-family:var(--font-title);font-size:6px" *ngIf="!r.error">✓ OK</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+        <ng-container *ngIf="isAuth && !histLoading && history.length">
+          <table class="history-table">
+            <thead><tr>
+              <th>SPELL</th><th>FIRST</th><th>SECOND</th><th>RESULT</th><th>REALM</th><th>STATUS</th>
+            </tr></thead>
+            <tbody>
+              <tr *ngFor="let r of pagedHistory">
+                <td><span class="op-badge op-badge--{{r.operation}}">{{r.operation}}</span></td>
+                <td>{{ r.thisValue }} {{ r.thisUnit }}</td>
+                <td>{{ r.thatValue != null ? r.thatValue + ' ' + r.thatUnit : '—' }}</td>
+                <td style="color:var(--fire-red)">{{ formatResult(r) }}</td>
+                <td style="font-size:14px;color:#aaa">{{ cleanType(r.thisMeasurementType) }}</td>
+                <td>
+                  <span class="err-badge" *ngIf="r.error">CURSED</span>
+                  <span style="color:var(--forest-mid);font-family:var(--font-title);font-size:6px" *ngIf="!r.error">✓ OK</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination" *ngIf="totalPages > 1">
+            <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">◀</button>
+            <ng-container *ngFor="let p of pages">
+              <span *ngIf="p === -1" class="page-ellipsis">…</span>
+              <button *ngIf="p !== -1" class="page-btn" [class.active]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
+            </ng-container>
+            <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">▶</button>
+          </div>
+        </ng-container>
       </div>
     </main>
   </div>
