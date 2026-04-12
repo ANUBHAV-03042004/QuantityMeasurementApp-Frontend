@@ -24,6 +24,8 @@ const OP_META: Record<string,any> = {
   DIVIDE:   { title:'Divide',   desc:'Ratio between two quantities',           symbol:'÷',  endpoint:'/divide' },
 };
 
+const PAGE_SIZE = 10;
+
 @Component({
   selector: 'app-operations',
   standalone: true,
@@ -47,6 +49,33 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   history: any[] = [];
   histLoading = false;
 
+  // Pagination
+  currentPage = 1;
+  readonly pageSize = PAGE_SIZE;
+  get totalPages() { return Math.max(1, Math.ceil(this.history.length / this.pageSize)); }
+  get pagedHistory() { return this.history.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize); }
+  get pages() {
+    const total = this.totalPages;
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    // show first, last, current ±1, with ellipsis gaps as -1
+    const p = this.currentPage;
+    const set = new Set([1, total, p, p-1, p+1].filter(n => n >= 1 && n <= total));
+    const sorted = Array.from(set).sort((a,b) => a-b);
+    const result: number[] = [];
+    for (let i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i] - sorted[i-1] > 1) result.push(-1); // ellipsis
+      result.push(sorted[i]);
+    }
+    return result;
+  }
+
+  goToPage(p: number) {
+    if (p < 1 || p > this.totalPages) return;
+    this.currentPage = p;
+    if (isPlatformBrowser(this.pid))
+      setTimeout(() => gsap.from('.history-table tbody tr', { opacity:0, y:4, stagger:.02, duration:.2, ease:'power2.out' }), 0);
+  }
+
   private api   = inject(ApiService);
   private auth  = inject(AuthService);
   private toast = inject(ToastService);
@@ -55,7 +84,6 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   get isAuth()     { return this.auth.isAuth(); }
   get isConvert()  { return this.currentOp === 'CONVERT'; }
 
-  /** Strips "Unit" suffix so "LengthUnit" → "LENGTH", "WeightUnit" → "WEIGHT" */
   cleanType(t: string): string {
     return (t || '').replace(/Unit$/i, '').toUpperCase();
   }
@@ -75,6 +103,7 @@ export class OperationsComponent implements OnInit, AfterViewInit {
 
   selectFilter(f: string) {
     this.histFilter = f;
+    this.currentPage = 1;
     if (this.isAuth) this.loadHistory();
   }
 
@@ -86,7 +115,6 @@ export class OperationsComponent implements OnInit, AfterViewInit {
   runOperation() {
     const v1 = parseFloat(this.val1);
     if (isNaN(v1)) { this.toast.show('Enter a valid number','error'); return; }
-    // CONVERT only needs a source value + two units — no second quantity value
     const v2 = this.isConvert ? 0 : parseFloat(this.val2);
     if (!this.isConvert && isNaN(v2)) { this.toast.show('Enter valid numbers','error'); return; }
     this.running = true;
@@ -112,6 +140,7 @@ export class OperationsComponent implements OnInit, AfterViewInit {
 
   loadHistory() {
     this.histLoading = true;
+    this.currentPage = 1;
     const f = this.histFilter;
     const obs = f==='ALL'
       ? forkJoin(['COMPARE','CONVERT','ADD','SUBTRACT','DIVIDE'].map(op =>
@@ -123,7 +152,9 @@ export class OperationsComponent implements OnInit, AfterViewInit {
 
     obs.subscribe({
       next: (data: any) => {
-        this.history = Array.isArray(data[0]) ? (data as any[][]).flat().sort((a:any,b:any)=>(b.id||0)-(a.id||0)) : (data as any[]).sort((a:any,b:any)=>(b.id||0)-(a.id||0));
+        this.history = Array.isArray(data[0])
+          ? (data as any[][]).flat().sort((a:any,b:any)=>(b.id||0)-(a.id||0))
+          : (data as any[]).sort((a:any,b:any)=>(b.id||0)-(a.id||0));
         this.histLoading = false;
         if (isPlatformBrowser(this.pid))
           setTimeout(()=>gsap.from('.history-table tbody tr', { opacity:0, y:6, stagger:.025, duration:.3, ease:'power2.out' }), 50);
