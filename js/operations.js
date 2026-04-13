@@ -210,29 +210,67 @@ async function loadHistory() {
   }
 }
 
+/* ── Pagination state ────────────────────────────────────────────────────── */
+let _historyData = [];
+let _currentPage = 1;
+const PAGE_SIZE  = 10;
+
 function renderHistory(data) {
+  _historyData = data || [];
+  _currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
   const wrap = document.getElementById('history-wrap');
-  if (!data || !data.length) {
+  if (!_historyData.length) {
     wrap.innerHTML = '<div class="history-empty">No records found</div>';
     return;
   }
+
+  const total      = _historyData.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const start      = (_currentPage - 1) * PAGE_SIZE;
+  const pageData   = _historyData.slice(start, start + PAGE_SIZE);
+
+  const rowsHtml = pageData.map(r => `
+    <tr>
+      <td><span class="op-badge ${r.operation || ''}">${r.operation || '—'}</span></td>
+      <td style="font-family:var(--font-mono)">${r.thisValue} ${r.thisUnit || ''}</td>
+      <td style="font-family:var(--font-mono)">${r.thatValue != null ? r.thatValue + ' ' + (r.thatUnit || '') : '—'}</td>
+      <td style="font-family:var(--font-mono);color:var(--accent)">${r.resultString || (r.resultValue !== 0 ? parseFloat((r.resultValue || 0).toFixed(4)) + ' ' + (r.resultUnit || '') : (r.resultValue === 0 && !r.error ? '0' : '—'))}</td>
+      <td style="font-size:11px;color:var(--text2)">${r.thisMeasurementType || '—'}</td>
+      <td>${r.error ? '<span class="err-badge">error</span>' : '<span style="color:var(--accent2);font-size:11px;font-family:var(--font-mono)">✓ ok</span>'}</td>
+    </tr>`).join('');
+
+  // Build page number buttons
+  let pagesHtml = '';
+  for (let i = 1; i <= totalPages; i++) {
+    pagesHtml += `<button class="pg-btn${i === _currentPage ? ' pg-active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+
   wrap.innerHTML = `
     <table class="history-table">
       <thead><tr>
         <th>OPERATION</th><th>FIRST</th><th>SECOND</th><th>RESULT</th><th>TYPE</th><th>STATUS</th>
       </tr></thead>
-      <tbody>${data.slice(0, 50).map(r => `
-        <tr>
-          <td><span class="op-badge ${r.operation || ''}">${r.operation || '—'}</span></td>
-          <td style="font-family:var(--font-mono)">${r.thisValue} ${r.thisUnit || ''}</td>
-          <td style="font-family:var(--font-mono)">${r.thatValue != null ? r.thatValue + ' ' + (r.thatUnit || '') : '—'}</td>
-          <td style="font-family:var(--font-mono);color:var(--accent)">${r.resultString || (r.resultValue !== 0 ? parseFloat((r.resultValue || 0).toFixed(4)) + ' ' + (r.resultUnit || '') : (r.resultValue === 0 && !r.error ? '0' : '—'))}</td>
-          <td style="font-size:11px;color:var(--text2)">${r.thisMeasurementType || '—'}</td>
-          <td>${r.error ? '<span class="err-badge">error</span>' : '<span style="color:var(--accent2);font-size:11px;font-family:var(--font-mono)">✓ ok</span>'}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="pagination">
+      <button class="pg-btn pg-arrow" onclick="goPage(${_currentPage - 1})" ${_currentPage === 1 ? 'disabled' : ''}>←</button>
+      ${pagesHtml}
+      <button class="pg-btn pg-arrow" onclick="goPage(${_currentPage + 1})" ${_currentPage === totalPages ? 'disabled' : ''}>→</button>
+      <span class="pg-info">${start + 1}–${Math.min(start + PAGE_SIZE, total)} of ${total}</span>
+    </div>`;
 
   if (typeof gsap !== 'undefined')
     gsap.from('.history-table tbody tr', { opacity: 0, y: 6, stagger: .025, duration: .3, ease: 'power2.out' });
+}
+
+function goPage(page) {
+  const totalPages = Math.ceil(_historyData.length / PAGE_SIZE);
+  if (page < 1 || page > totalPages) return;
+  _currentPage = page;
+  renderPage();
+  document.querySelector('.history-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
