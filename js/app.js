@@ -26,10 +26,12 @@ async function api(method, path, body) {
 
 /* ── Logout ─────────────────────────────────────────────────────────────── */
 function doLogout() {
+  stopInactivityTimer();
   state.token = null;
   state.user  = null;
   localStorage.removeItem('qm_token');
   localStorage.removeItem('qm_user');
+  localStorage.removeItem('qm_last_active');
   updateNavUser();
   toast('Signed out', 'info');
   setTimeout(() => location.href = 'index.html', 800);
@@ -138,6 +140,56 @@ function initNavScroll() {
   });
 }
 
+/* ── Inactivity / tab-close session management ──────────────────────────── */
+const INACTIVITY_MS  = 60 * 60 * 1000; // 1 hour
+const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+let   inactivityTimer = null;
+
+function resetInactivityTimer() {
+  localStorage.setItem('qm_last_active', Date.now().toString());
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    doLogout();
+    toast('Signed out due to inactivity', 'info');
+  }, INACTIVITY_MS);
+}
+
+function startInactivityTimer() {
+  ACTIVITY_EVENTS.forEach(e => window.addEventListener(e, resetInactivityTimer, { passive: true }));
+  resetInactivityTimer();
+}
+
+function stopInactivityTimer() {
+  if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+  ACTIVITY_EVENTS.forEach(e => window.removeEventListener(e, resetInactivityTimer));
+}
+
+function checkSessionExpiry() {
+  const last = localStorage.getItem('qm_last_active');
+  if (last && state.token && (Date.now() - parseInt(last, 10) >= INACTIVITY_MS)) {
+    // Session expired while tab was closed — clear silently, no toast
+    state.token = null;
+    state.user  = null;
+    localStorage.removeItem('qm_token');
+    localStorage.removeItem('qm_user');
+    localStorage.removeItem('qm_last_active');
+    // Redirect to login if on a protected page
+    const page = location.pathname.split('/').pop();
+    if (['dashboard.html', 'profile.html'].includes(page)) {
+      location.href = 'login.html';
+    }
+  }
+}
+
+// Clear session on tab/window close so next open starts fresh
+window.addEventListener('beforeunload', () => {
+  localStorage.removeItem('qm_token');
+  localStorage.removeItem('qm_user');
+  localStorage.removeItem('qm_last_active');
+  state.token = null;
+  state.user  = null;
+});
+
 /* ── Init shared on every page ──────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof gsap !== 'undefined') {
@@ -146,8 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.registerPlugin(...plugins);
     CustomEase.create('expo', 'M0,0 C0.16,1 0.3,1 1,1');
   }
+  // Check if session expired while tab was closed
+  checkSessionExpiry();
   updateNavUser();
   setActiveTab();
   initCursor();
   initNavScroll();
+  // Start inactivity timer if logged in
+  if (isAuthed()) startInactivityTimer();
 });

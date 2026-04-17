@@ -2,10 +2,8 @@
 function loginWithGoogle() {
   // Spring Security handles the full OAuth2 flow; backend redirects to
   // oauth2-callback.html with ?token=<jwt> on success.
- window.location.href = 'https://dpvh78pj77mvc.cloudfront.net/oauth2/authorization/google?frontend=legacy';
+  window.location.href = API.replace('/api/v1', '') + '/oauth2/authorization/google?frontend=legacy';
 }
-// Google OAuth — change:
-
 
 /* ── Login ───────────────────────────────────────────────────────────────── */
 async function doLogin() {
@@ -20,25 +18,19 @@ async function doLogin() {
   btn.disabled = true;
 
   try {
-    
-  // Login fetch — change:
-const res = await fetch('https://dpvh78pj77mvc.cloudfront.net/api/v1/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pass }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw json;
+    const json = await api('POST', '/auth/login', { email, password: pass });
 
     state.token = json.token;
     state.user  = { email: json.email, role: json.role };
     localStorage.setItem('qm_token', json.token);
     localStorage.setItem('qm_user',  JSON.stringify(state.user));
+    localStorage.setItem('qm_last_active', Date.now().toString());
+    if (typeof startInactivityTimer === 'function') startInactivityTimer();
 
     toast('Welcome back!', 'success');
     setTimeout(() => location.href = 'operations.html', 700);
   } catch (e) {
-    const msg = e.message || e.error || 'Invalid email or password';
+    const msg = (e.data && (e.data.message || e.data.error)) || e.message || 'Invalid email or password';
     toast(msg, 'error');
     showError('login-pass-err', msg);
   }
@@ -65,24 +57,20 @@ async function doRegister() {
   btn.disabled = true;
 
   try {
-  const res = await fetch('https://dpvh78pj77mvc.cloudfront.net/api/v1/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ firstName, lastName, email, password }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw json;
+    const json = await api('POST', '/auth/register', { firstName, lastName, email, password });
 
     state.token = json.token;
     state.user  = { email: json.email, role: json.role };
     localStorage.setItem('qm_token', json.token);
     localStorage.setItem('qm_user',  JSON.stringify(state.user));
+    localStorage.setItem('qm_last_active', Date.now().toString());
+    if (typeof startInactivityTimer === 'function') startInactivityTimer();
 
     toast('Account created!', 'success');
     setTimeout(() => location.href = 'operations.html', 700);
   } catch (e) {
-    const msg = e.message
-      || (e.errors && Object.values(e.errors).join('. '))
+    const msg = (e.data && (e.data.message || (e.data.errors && Object.values(e.data.errors).join('. '))))
+      || e.message
       || 'Registration failed';
     toast(msg, 'error');
     showError('reg-pass-err', msg);
