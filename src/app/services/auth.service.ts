@@ -95,8 +95,11 @@ export class AuthService implements OnDestroy {
   }
 
   private onTabClose() {
-    // Clear auth so the next fresh tab load starts logged out
+    // Clear storage AND null the signals so any same-tab reads after unload
+    // see the logged-out state (prevents stale email showing in navbar).
     this.clearStorage();
+    this._token.set(null);
+    this._user.set(null);
   }
 
   private clearStorage() {
