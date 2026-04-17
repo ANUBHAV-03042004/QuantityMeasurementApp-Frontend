@@ -1,10 +1,9 @@
 import { Component, inject, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { NgIf } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NgIf, isPlatformBrowser } from '@angular/common';
 import { ToastService } from '../../services/toast.service';
-import { isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 
 @Component({
@@ -14,10 +13,10 @@ import { gsap } from 'gsap';
   templateUrl: './forgot-password.component.html'
 })
 export class ForgotPasswordComponent implements AfterViewInit {
-  email = '';
+  email    = '';
   emailErr = '';
-  loading = false;
-  sent = false;
+  loading  = false;
+  sent     = false;
 
   private BASE  = 'https://dpvh78pj77mvc.cloudfront.net/api/v1';
   private toast = inject(ToastService);
@@ -35,10 +34,17 @@ export class ForgotPasswordComponent implements AfterViewInit {
     this.emailErr = '';
     if (!this.email) { this.emailErr = 'Email is required'; return; }
     this.loading = true;
-    this.http.post<any>(`${this.BASE}/auth/forgot-password`, { email: this.email })
+
+    // Tell the backend which frontend origin sent this request so the reset
+    // link in the email points to the correct deployment (Vercel vs GitHub Pages).
+    const headers = new HttpHeaders({
+      'X-Frontend-Origin': isPlatformBrowser(this.pid) ? window.location.origin : ''
+    });
+
+    this.http.post<any>(`${this.BASE}/auth/forgot-password`, { email: this.email }, { headers })
       .subscribe({
         next: () => {
-          this.sent = true;
+          this.sent    = true;
           this.loading = false;
           this.toast.show('Scroll dispatched! Check your email 📜', 'success');
         },
